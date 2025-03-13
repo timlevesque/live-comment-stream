@@ -36,7 +36,7 @@ wss.on('connection', (ws) => {
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'messages-public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Start server
 server.listen(PORT, '0.0.0.0', () => {
