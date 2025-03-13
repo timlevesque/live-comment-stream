@@ -27,6 +27,13 @@
         .emoji-ghost.animate {
             animation: fadeUp 0.8s ease-out;
         }
+        textarea#postInput {
+    resize: none !important;
+    overflow-y: hidden;
+}
+        textarea:focus{
+            outline: none;
+        }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center justify-center bg-gray-800">
@@ -71,9 +78,9 @@
     </div>
     <div class="w-full max-w-2xl rounded-xl  shadow-lg mb-6">
         <div class="mb-4 ">
-            <textarea id="postInput" class=" w-full p-2 text-sm border border-gray-300 rounded-lg mb-3" rows="3" placeholder="Share a recent money win..." type="submit"></textarea>
+            <textarea id="postInput" class="resize-0 w-full p-4 border border-gray-300 rounded-lg mb-3" rows="1" placeholder="Share a recent money win..." type="submit"></textarea>
             
-            <button id="postButton" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">Post</button>
+            <button id="postButton" type="submit" class=" hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">Post</button>
         </div>
     </div>
 </div>
@@ -189,21 +196,34 @@
             }
         });
 
+        // Add this after your existing event listeners in the script section
+
+        // Function to handle posting via Enter key
+        document.getElementById("postInput").addEventListener("keydown", function(event) {
+            // Check if Enter key is pressed without Shift (allows for newlines with Shift+Enter)
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault(); // Prevent default behavior (newline)
+                
+                // Trigger the post button click
+                document.getElementById("postButton").click();
+            }
+        });
+
         // Function to Add a New Post to the UI
         function addPostToUI(username, step, message, postId) {
             const postsContainer = document.getElementById("posts-container");
             
             const postHTML = `
-                <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-5 mb-4" data-post-id="${postId}">
+                <div class="text-white rounded-xl shadow-lg border-2 border-gray-200 p-5 mb-4" data-post-id="${postId}">
                     <div class="flex items-center">
                         <div>
-                            <p class="font-semibold text-sm text-gray-800">Anonymous</p>
+                            <p class="font-semibold text-sm">Anonymous</p>
                         </div>
                     </div>
                     <div class="pt-3 pb-1">
-                        <p class="text-gray-700">"${message}"</p>
+                        <p class="text-white">"${message}"</p>
                     </div>
-                    <div class="inline-flex justify-between items-center bg-white mt-3">
+                    <div class="inline-flex justify-between items-center  mt-3">
                         <div class="flex space-x-3">
                             <div class="emoji-trigger cursor-pointer text-xl" data-emoji="👍">👍</div>
                             <div class="emoji-trigger cursor-pointer text-xl" data-emoji="❤️">❤️</div>
@@ -282,7 +302,46 @@
                     animateEmojiGhost(emojiChar, event);
                 }
             }
-        });        
+        });   
+        
+        // Add this CSS to your existing style section
+// textarea { resize: none; overflow: hidden; min-height: 40px; }
+
+// Add this JavaScript function after your existing script
+function autoResizeTextarea() {
+    const textarea = document.getElementById("postInput");
+    
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = "auto";
+    
+    // Set the height to match content (plus a little extra space)
+    textarea.style.height = (textarea.scrollHeight) + "px";
+}
+
+// Initialize with a smaller height
+document.getElementById("postInput").setAttribute("rows", "1");
+
+// Add event listeners to resize as content changes
+document.getElementById("postInput").addEventListener("input", autoResizeTextarea);
+document.getElementById("postInput").addEventListener("focus", autoResizeTextarea);
+
+// Reset height when post is submitted
+document.getElementById("postButton").addEventListener("click", function() {
+    // Wait until next tick after the content is cleared
+    setTimeout(() => {
+        document.getElementById("postInput").style.height = "auto";
+    }, 0);
+});
+
+// Also reset after posting with Enter key
+document.getElementById("postInput").addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        // Wait until next tick after the content is cleared
+        setTimeout(() => {
+            document.getElementById("postInput").style.height = "auto";
+        }, 0);
+    }
+});
     </script>
 </body>
 </html>
